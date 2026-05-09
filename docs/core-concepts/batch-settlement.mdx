@@ -3,9 +3,9 @@ title: "Batch settlement"
 description: "High-throughput EVM payments with escrow, off-chain vouchers, and batched onchain redemption—ideal for agents and metered APIs."
 ---
 
-The **`batch-settlement`** payment scheme lets buyers fund an onchain channel once, then authorize many HTTP-paid requests with **off-chain signatures** (vouchers). Value moves onchain later in **batches**, instead of every request carrying its own settlement transaction.
+The **`batch-settlement`** payment scheme lets buyers fund an onchain channel once, then authorize many HTTP-paid requests with off-chain signatures (vouchers). Value moves onchain later in batches, instead of every request carrying its own settlement transaction.
 
-That matches workloads where per-request gas or facilitator overhead would dominate tiny charges—for example **agents**, **streaming**, or **metered inference** where **each call can cost a different amount**.
+That matches workloads where per-request gas or facilitator overhead would dominate tiny charges—for example agents, streaming, or metered inference where each call can cost a different amount.
 
 ### How it relates to `exact` and `upto`
 
@@ -13,13 +13,13 @@ That matches workloads where per-request gas or facilitator overhead would domin
 |--------|-------------|---------------------------|
 | **`exact`** | Fixed price per request | With each settled payment |
 | **`upto`** | Variable amount up to a signed maximum | With each settled payment |
-| **`batch-settlement`** | Same “up to” pricing idea, but across **many** requests over one funded channel | Later, in claim/settle **batches** (network-specific) |
+| **`batch-settlement`** | Same “up to” pricing idea, but across **many** requests over one funded channel | Later, in claim/settle batches (network-specific) |
 
-For **`batch-settlement`**, the payment requirement’s **`amount`** is still a **per-request ceiling**. The seller records actual usage up to that maximum (aligned with **upto** semantics). Settlement batches **accumulate** those charges rather than executing a full transfer on every call.
+For **`batch-settlement`**, the payment requirement’s **`amount`** is still a per-request ceiling. The seller records actual usage up to that maximum (aligned with **upto** semantics). Settlement batches accumulate those charges, rather than executing a full transfer on every call.
 
 ### What happens on EVM (capital-backed)
 
-The reference binding uses **stateless unidirectional channels**: the payer deposits ERC-20 into an escrow contract, then signs **monotonic cumulative vouchers** (`maxClaimableAmount`) per request. The seller verifies vouchers cheaply (signature check), then submits **batched claims** and a separate **settle** step when redeeming—see the [EVM binding specification](https://github.com/x402-foundation/x402/blob/main/specs/schemes/batch-settlement/scheme_batch_settlement_evm.md).
+The reference binding uses stateless unidirectional channels: the payer deposits ERC-20 into an escrow contract, then signs monotonic cumulative vouchers (`maxClaimableAmount`) per request. The seller verifies vouchers cheaply (signature check), then submits batched claims and a separate settle step when redeeming—see the [EVM binding specification](https://github.com/x402-foundation/x402/blob/main/specs/schemes/batch-settlement/scheme_batch_settlement_evm.md).
 
 Deposits typically use **EIP-3009** or **Permit2**, consistent with other EVM schemes. Which chains are available depends on **[network](/core-concepts/network-and-token-support)** support and whether the batch-settlement contracts are deployed for that chain.
 
